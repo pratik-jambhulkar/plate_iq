@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
-from invoice.managers import DefaultManager
+from invoice.managers import DefaultManager, UserManager
 from invoice.utils import generate_invoice_number
 
 
@@ -29,6 +29,8 @@ class User(AbstractBaseUser, PermissionsMixin, CommonField):
     # ParentModelFields
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    objects = UserManager()
 
     # Methods
     def __str__(self):
