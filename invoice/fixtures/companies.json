@@ -1,0 +1,46 @@
+[
+  {
+    "model": "invoice.Company",
+    "pk": "56aae847-a6ca-4959-b42b-738ed6db4faf",
+    "fields": {
+      "name": "A star Hotels",
+      "email": "admin@astar.com",
+      "address": "Pune, India",
+      "created_at": "2020-08-28T22:17:40Z",
+      "updated_at": "2020-08-28T22:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.Company",
+    "pk": "82aea13e-a789-428f-972d-06d07e0a565d",
+    "fields": {
+      "name": "Super Chicken",
+      "email": "admin@superchicken.com",
+      "address": "Mumbai, India",
+      "created_at": "2020-08-28T22:17:40Z",
+      "updated_at": "2020-08-28T22:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.Company",
+    "pk": "16437284-3d59-4deb-9094-d78452aa8c7e",
+    "fields": {
+      "name": "The Fishing Company",
+      "email": "admin@tfc.com",
+      "address": "Pune, India",
+      "created_at": "2020-08-28T22:17:40Z",
+      "updated_at": "2020-08-28T22:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.Company",
+    "pk": "a442284b-101a-48b9-9c6c-26dc162c6e30",
+    "fields": {
+      "name": "Tag hotels",
+      "email": "support@plate.com",
+      "address": "Mumbai, India",
+      "created_at": "2020-08-28T22:17:40Z",
+      "updated_at": "2020-08-28T22:17:40Z"
+    }
+  }
+]

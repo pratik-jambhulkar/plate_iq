@@ -30,9 +30,6 @@ class User(AbstractBaseUser, PermissionsMixin, CommonField):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     # Methods
     def __str__(self):
         return self.email
@@ -58,9 +55,6 @@ class Company(CommonField):
     address = models.TextField()
     email = models.EmailField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     class Meta:
         db_table = 'companies'
 
@@ -69,14 +63,13 @@ class Invoice(CommonField):
     invoice_number = models.CharField(max_length=8, primary_key=True, editable=False, default=generate_invoice_number)
     terms = models.TextField(null=True, blank=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     deu_date = models.DateTimeField()
 
     digitized = models.BooleanField(default=False)
-    digitized_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True)
+    digitized_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, related_name='digitized_invoice')
     purchaser = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, related_name='purchaser')
     vendor = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, related_name='vendor')
+    created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, related_name='created_invoice')
 
     class Meta:
         db_table = 'invoices'
@@ -91,8 +84,6 @@ class InvoiceItem(CommonField):
     amount = models.FloatField()
 
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True, related_name='invoice_items')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'invoice_items'

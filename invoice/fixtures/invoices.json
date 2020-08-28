@@ -1,0 +1,32 @@
+[
+  {
+    "model": "invoice.Invoice",
+    "pk": "INV12345",
+    "fields": {
+      "terms": "Legal Terms",
+      "deu_date": "2020-10-28T23:17:40Z",
+      "digitized": false,
+      "digitized_by": null,
+      "created_by": "f25731d5-46da-41a7-8c44-5a67195e3ebe",
+      "purchaser": "56aae847-a6ca-4959-b42b-738ed6db4faf",
+      "vendor": "82aea13e-a789-428f-972d-06d07e0a565d",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.Invoice",
+    "pk": "INV56789",
+    "fields": {
+      "terms": "Legal Terms",
+      "deu_date": "2020-11-28T23:17:40Z",
+      "digitized": true,
+      "digitized_by": "de3ae794-f21f-4791-a926-445e64ef032b",
+      "created_by": "f116092a-69dc-46ad-ae9b-1b86d6069c14",
+      "purchaser": "a442284b-101a-48b9-9c6c-26dc162c6e30",
+      "vendor": "16437284-3d59-4deb-9094-d78452aa8c7e",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "model": "invoice.InvoiceItem",
+    "pk": "da848f2a-1a8b-4214-93dc-2dde8e936d49",
+    "fields": {
+      "name": "Boneless Chicken",
+      "description": "Chicken without bones",
+      "quantity": 10,
+      "price": 20,
+      "amount": 200,
+      "invoice": "INV12345",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.InvoiceItem",
+    "pk": "ebe9293f-0d4f-432a-b634-46bcb1ebae17",
+    "fields": {
+      "name": "Chicken Legs",
+      "description": "Chicken legs",
+      "quantity": 20,
+      "price": 30,
+      "amount": 600,
+      "invoice": "INV12345",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.InvoiceItem",
+    "pk": "fc559569-5dd4-496a-9541-a05a3f57cc44",
+    "fields": {
+      "name": "Sea Fish",
+      "description": "Fish from the sea",
+      "quantity": 10,
+      "price": 20,
+      "amount": 200,
+      "invoice": "INV56789",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  },
+  {
+    "model": "invoice.InvoiceItem",
+    "pk": "165a7271-2d23-43b6-9085-01fcea756d4f",
+    "fields": {
+      "name": "River Fish",
+      "description": "Fish from the river",
+      "quantity": 20,
+      "price": 30,
+      "amount": 600,
+      "invoice": "INV56789",
+      "created_at": "2020-08-28T23:17:40Z",
+      "updated_at": "2020-08-28T23:17:40Z"
+    }
+  }
+]
