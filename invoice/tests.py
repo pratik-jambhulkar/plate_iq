@@ -6,9 +6,10 @@ from django.http import JsonResponse
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
+from rest_framework import status
 
 from invoice.models import User, Invoice
-from invoice.serializers import UserSerializer, InvoiceSerializer
+from invoice.serializers import UserSerializer, InvoiceSerializer, InvoiceDigitizedSerializer
 
 
 class TestUploadInvoiceAPI(APITestCase):
@@ -49,3 +50,48 @@ class TestUploadInvoiceAPI(APITestCase):
         response = self.client.post(path=self.url, data=data, format='multipart', HTTP_ACCEPT='application/json')
         error = {'invoice': ['Invoice size too large(must be less than 1 MB).']}
         self.assertEqual(json.loads(response.content), json.loads(JsonResponse(ValidationError(error).detail).content))
+
+
+class TestDigitizedStatusAPI(APITestCase):
+    base_dir = settings.BASE_DIR
+    fixtures = [base_dir + '/invoice/fixtures/users.json',
+                base_dir + '/invoice/fixtures/companies.json',
+                base_dir + '/invoice/fixtures/invoices.json',
+                base_dir + '/invoice/fixtures/invoice_items.json',
+                ]
+
+    def setUp(self):
+        self.user = User.objects.get(email='jon.doe@plate.com')
+        user_serializer = UserSerializer(self.user).data
+        self.authentication_token = user_serializer['token']
+        self.client.credentials(HTTP_AUTHORIZATION=self.authentication_token)
+        self.invoice = Invoice.objects.get(pk='INV12345')
+        self.url = reverse('invoices-digitized', args=(self.invoice.invoice_number,))
+
+    # API /invoices/pk/digitized - Test to check invoice is digitized
+    def test_not_digitized_invoice(self):
+        response = self.client.get(path=self.url, HTTP_ACCEPT='application/json')
+        api_response = json.loads(response.content)
+        expected_response = json.loads(JsonResponse(InvoiceDigitizedSerializer(self.invoice).data).content)
+        self.assertEqual(api_response, expected_response)
+        self.assertEqual(api_response['digitized'], False)
+
+    # API /invoices/pk/digitized - Test to check invoice is digitized
+    def test_digitized_invoice(self):
+        invoice = Invoice.objects.get(pk='INV56789')
+        url = reverse('invoices-digitized', args=(invoice.invoice_number,))
+        response = self.client.get(path=url, HTTP_ACCEPT='application/json')
+        api_response = json.loads(response.content)
+        expected_response = json.loads(JsonResponse(InvoiceDigitizedSerializer(invoice).data).content)
+        self.assertEqual(api_response, expected_response)
+        self.assertEqual(api_response['digitized'], True)
+
+    # API /invoices/pk/digitized - Test to check invoice is digitized with invalid invoice number
+    def test_invalid_coupon(self):
+        url = reverse('invoices-digitized', args=("invalid123",))
+        response = self.client.get(path=url, HTTP_ACCEPT='application/json')
+        api_response = json.loads(response.content)
+        self.assertEqual(api_response, {
+            "detail": "Not found."
+        })
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

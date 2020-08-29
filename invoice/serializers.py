@@ -55,3 +55,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = '__all__'
+
+
+class InvoiceDigitizedSerializer(serializers.ModelSerializer):
+    digitized_by = UserResponseSerializer()
+
+    class Meta:
+        model = Invoice
+        fields = ('digitized', 'digitized_by', 'invoice_number')

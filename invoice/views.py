@@ -4,7 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from invoice.models import User, Invoice, Company
-from invoice.serializers import UserSerializer, InvoiceSerializer, CompanySerializer, UploadInvoiceSerializer
+from invoice.serializers import UserSerializer, InvoiceSerializer, CompanySerializer, UploadInvoiceSerializer, \
+    InvoiceDigitizedSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -31,6 +32,11 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         upload_serializer = UploadInvoiceSerializer(data=request.data)
         upload_serializer.is_valid(raise_exception=True)
         return JsonResponse(self.serializer_class(self.queryset.first()).data)
+
+    @action(methods=['get'], detail=True, url_name='digitized', url_path='digitized')
+    def digitized(self, request, *args, **kwargs):
+        invoice = self.get_object()
+        return JsonResponse(InvoiceDigitizedSerializer(invoice).data)
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
