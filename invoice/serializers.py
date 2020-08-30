@@ -102,7 +102,7 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        invoice_items = validated_data.pop('invoice_items')
+        invoice_items = validated_data.pop('invoice_items', [])
         invoice = self.Meta.model.objects.create(**validated_data)
         for invoice_item in invoice_items:
             invoice_item['invoice'] = invoice
@@ -111,8 +111,9 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        invoice_items = validated_data.pop('invoice_items')
-        InvoiceItem.objects.create_items(instance, invoice_items)
+        if validated_data.get('invoice_items'):
+            invoice_items = validated_data.pop('invoice_items')
+            InvoiceItem.objects.create_items(instance, invoice_items)
         for (key, value) in validated_data.items():
             setattr(instance, key, value)
         instance.save()

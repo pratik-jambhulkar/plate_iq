@@ -16,9 +16,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def create(self, request, *args, **kwargs):
-        return UnAuthorisedRequest
-
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     """
@@ -78,14 +75,42 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         return JsonResponse({'invoice': "The invoice is already digitized!"}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
+        """
+        API to create an invoice with superuser
+        :param request: data to create the invoice
+        :param args:
+        :param kwargs:
+        :return:
+        """
         invoice_serializer = InvoiceCreateSerializer(data=request.data)
         invoice_serializer.is_valid(raise_exception=True)
         invoice = invoice_serializer.save(created_by=request.user)
         return JsonResponse(self.serializer_class(invoice).data)
 
     def update(self, request, *args, **kwargs):
+        """
+        Update invoice API
+        :param request: data to update the invoice
+        :param args:
+        :param kwargs:
+        :return:
+        """
         invoice = self.get_object()
         invoice_serializer = InvoiceCreateSerializer(invoice, data=request.data)
+        invoice_serializer.is_valid(raise_exception=True)
+        invoice = invoice_serializer.save()
+        return JsonResponse(self.serializer_class(invoice).data)
+
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Partially update invoice
+        :param request: partial data
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        invoice = self.get_object()
+        invoice_serializer = InvoiceCreateSerializer(invoice, data=request.data, partial=True)
         invoice_serializer.is_valid(raise_exception=True)
         invoice = invoice_serializer.save()
         return JsonResponse(self.serializer_class(invoice).data)
