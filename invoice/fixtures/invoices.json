@@ -1,8 +1,9 @@
 [
   {
     "model": "invoice.Invoice",
-    "pk": "INV12345",
+    "pk": "7f0b820f-d281-4d01-9f83-7d91e31c362b",
     "fields": {
+      "invoice_number": "INV12345",
       "terms": "Legal Terms",
       "deu_date": "2020-10-28T23:17:40Z",
       "digitized": false,
@@ -16,8 +17,9 @@
   },
   {
     "model": "invoice.Invoice",
-    "pk": "INV56789",
+    "pk": "3435c1bb-e3ac-4ba4-804c-71511a28d4a3",
     "fields": {
+      "invoice_number": "INV56789",
       "terms": "Legal Terms",
       "deu_date": "2020-11-28T23:17:40Z",
       "digitized": true,

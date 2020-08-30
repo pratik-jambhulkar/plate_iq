@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -51,7 +52,7 @@ class TestUploadInvoiceAPI(APITestCase):
         error = {'invoice': ['Invoice size too large(must be less than 1 MB).']}
         self.assertEqual(json.loads(response.content), json.loads(JsonResponse(ValidationError(error).detail).content))
 
-    # API /invoices/pk/digitized - Test to check invoice is digitized without authentication
+    # API /invoices/upload - Test to check upload without authentication
     def test_upload_not_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION="wrong auth")
         invoice = SimpleUploadedFile("invoice.pdf", b"file_content", content_type="application/pdf")
@@ -77,8 +78,8 @@ class TestDigitizedStatusAPI(APITestCase):
         user_serializer = UserSerializer(self.user).data
         self.authentication_token = user_serializer['token']
         self.client.credentials(HTTP_AUTHORIZATION=self.authentication_token)
-        self.invoice = Invoice.objects.get(pk='INV12345')
-        self.url = reverse('invoices-digitized_status', args=(self.invoice.invoice_number,))
+        self.invoice = Invoice.objects.get(invoice_number='INV12345')
+        self.url = reverse('invoices-digitized_status', args=(self.invoice.pk,))
 
     # API /invoices/pk/digitized-status - Test to check invoice is digitized
     def test_not_digitized_invoice(self):
@@ -90,8 +91,8 @@ class TestDigitizedStatusAPI(APITestCase):
 
     # API /invoices/pk/digitized-status - Test to check invoice is digitized
     def test_digitized_invoice(self):
-        invoice = Invoice.objects.get(pk='INV56789')
-        url = reverse('invoices-digitized_status', args=(invoice.invoice_number,))
+        invoice = Invoice.objects.get(invoice_number='INV56789')
+        url = reverse('invoices-digitized_status', args=(invoice.pk,))
         response = self.client.get(path=url, HTTP_ACCEPT='application/json')
         api_response = json.loads(response.content)
         expected_response = json.loads(JsonResponse(InvoiceDigitizedSerializer(invoice).data).content)
@@ -100,7 +101,7 @@ class TestDigitizedStatusAPI(APITestCase):
 
     # API /invoices/pk/digitized-status - Test to check invoice is digitized with invalid invoice number
     def test_invalid_invoice(self):
-        url = reverse('invoices-digitized_status', args=("invalid123",))
+        url = reverse('invoices-digitized_status', args=(str(uuid.uuid4()),))
         response = self.client.get(path=url, HTTP_ACCEPT='application/json')
         api_response = json.loads(response.content)
         self.assertEqual(api_response, {
@@ -132,8 +133,8 @@ class TestInvoiceRetrieveAPI(APITestCase):
         user_serializer = UserSerializer(self.user).data
         self.authentication_token = user_serializer['token']
         self.client.credentials(HTTP_AUTHORIZATION=self.authentication_token)
-        self.invoice = Invoice.objects.get(pk='INV56789')
-        self.url = reverse('invoices-detail', args=(self.invoice.invoice_number,))
+        self.invoice = Invoice.objects.get(invoice_number='INV56789')
+        self.url = reverse('invoices-detail', args=(self.invoice.pk,))
 
     # API /invoices/pk - Test to retrieve digitized invoice
     def test_digitized_invoice(self):
@@ -145,8 +146,8 @@ class TestInvoiceRetrieveAPI(APITestCase):
 
     # API /invoices/pk - Test to retrieve non digitized invoice
     def test_not_digitized_invoice(self):
-        invoice = Invoice.objects.get(pk='INV12345')
-        url = reverse('invoices-detail', args=(invoice.invoice_number,))
+        invoice = Invoice.objects.get(invoice_number='INV12345')
+        url = reverse('invoices-detail', args=(invoice.pk,))
         response = self.client.get(path=url, HTTP_ACCEPT='application/json')
         api_response = json.loads(response.content)
         expected_response = json.loads(
@@ -156,8 +157,8 @@ class TestInvoiceRetrieveAPI(APITestCase):
 
     # API /invoices/pk - Test to retrieve with super user
     def test_retrieve_superuser(self):
-        invoice = Invoice.objects.get(pk='INV12345')
-        url = reverse('invoices-detail', args=(invoice.invoice_number,))
+        invoice = Invoice.objects.get(invoice_number='INV12345')
+        url = reverse('invoices-detail', args=(invoice.pk,))
         self.user.is_superuser = True
         self.user.save()
         response = self.client.get(path=url, HTTP_ACCEPT='application/json')
@@ -190,8 +191,8 @@ class TestDigitizeAPI(APITestCase):
         user_serializer = UserSerializer(self.user).data
         self.authentication_token = user_serializer['token']
         self.client.credentials(HTTP_AUTHORIZATION=self.authentication_token)
-        self.invoice = Invoice.objects.get(pk='INV12345')
-        self.url = reverse('invoices-digitize', args=(self.invoice.invoice_number,))
+        self.invoice = Invoice.objects.get(invoice_number='INV12345')
+        self.url = reverse('invoices-digitize', args=(self.invoice.pk,))
 
     # API /invoices/pk/digitize - Test to digitizing an invoice
     def test_digitize_invoice(self):

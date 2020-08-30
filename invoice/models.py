@@ -62,7 +62,8 @@ class Company(CommonField):
 
 
 class Invoice(CommonField):
-    invoice_number = models.CharField(max_length=8, primary_key=True, editable=False, default=generate_invoice_number)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice_number = models.CharField(max_length=255, unique=True)
     terms = models.TextField(null=True, blank=True)
 
     deu_date = models.DateTimeField()
