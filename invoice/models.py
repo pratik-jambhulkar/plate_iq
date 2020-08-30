@@ -73,6 +73,13 @@ class Invoice(CommonField):
     vendor = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, related_name='vendor')
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, related_name='created_invoice')
 
+    @property
+    def total(self):
+        total = 0
+        for item in self.invoice_items.all():
+            total += item.amount
+        return total
+
     class Meta:
         db_table = 'invoices'
 

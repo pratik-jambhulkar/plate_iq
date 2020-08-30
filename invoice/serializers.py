@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from invoice.models import User, Invoice, Company
+from invoice.models import User, Invoice, Company, InvoiceItem
 from invoice.validators import validate_invoice_file
 
 
@@ -46,15 +46,27 @@ class CompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = '__all__'
+
+
 class InvoiceSerializer(serializers.ModelSerializer):
     purchaser = CompanySerializer()
     vendor = CompanySerializer()
     created_by = UserResponseSerializer()
     digitized_by = UserResponseSerializer()
+    invoice_items = InvoiceItemSerializer(many=True)
+    total = serializers.SerializerMethodField()
 
     class Meta:
         model = Invoice
         fields = '__all__'
+
+    @staticmethod
+    def get_total(obj):
+        return obj.total
 
 
 class InvoiceDigitizedSerializer(serializers.ModelSerializer):
