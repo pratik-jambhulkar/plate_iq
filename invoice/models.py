@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
-from invoice.managers import DefaultManager, UserManager
+from invoice.managers import DefaultManager, UserManager, InvoiceItemManager
 from invoice.utils import generate_invoice_number
 
 
@@ -94,6 +94,8 @@ class InvoiceItem(CommonField):
     amount = models.FloatField()
 
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True, related_name='invoice_items')
+
+    objects = InvoiceItemManager()
 
     class Meta:
         db_table = 'invoice_items'

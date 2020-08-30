@@ -1,7 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
 from invoice.models import User, Invoice, Company, InvoiceItem
+from invoice.utils import generate_invoice_number
 from invoice.validators import validate_invoice_file
 
 
@@ -75,3 +77,47 @@ class InvoiceDigitizedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = ('digitized', 'digitized_by', 'invoice_number')
+
+
+class InvoiceItemsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = ('name', 'description', 'quantity', 'price', 'amount')
+
+
+class InvoiceCreateSerializer(serializers.ModelSerializer):
+    purchaser = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all(), error_messages={
+        'required': 'This field is required.',
+        'does_not_exist': 'Invalid Purchaser provided.',
+        'incorrect_type': 'Provide data in correct format.'
+    })
+    vendor = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all(), error_messages={
+        'required': 'This field is required.',
+        'does_not_exist': 'Invalid Vendor provided.',
+        'incorrect_type': 'Provide data in correct format.'
+    })
+    invoice_items = serializers.ListField(child=InvoiceItemSerializer(), min_length=1)
+    digitized = serializers.BooleanField(default=False)
+    invoice_number = serializers.CharField(default=generate_invoice_number)
+
+    @transaction.atomic
+    def create(self, validated_data):
+        invoice_items = validated_data.pop('invoice_items')
+        invoice = self.Meta.model.objects.create(**validated_data)
+        for invoice_item in invoice_items:
+            invoice_item['invoice'] = invoice
+            InvoiceItem.objects.create(**invoice_item)
+        return invoice
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        invoice_items = validated_data.pop('invoice_items')
+        InvoiceItem.objects.create_items(instance, invoice_items)
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+    class Meta:
+        model = Invoice
+        fields = ('purchaser', 'vendor', 'invoice_items', 'invoice_number', 'terms', 'deu_date', 'digitized')

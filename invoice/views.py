@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from invoice.models import User, Invoice, Company
 from invoice.permissions import InvoicePermission
 from invoice.serializers import UserSerializer, InvoiceSerializer, CompanySerializer, UploadInvoiceSerializer, \
-    InvoiceDigitizedSerializer
+    InvoiceDigitizedSerializer, InvoiceCreateSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -77,6 +77,19 @@ class InvoiceViewSet(viewsets.ModelViewSet):
             return JsonResponse(InvoiceDigitizedSerializer(invoice).data)
         return JsonResponse({'invoice': "The invoice is already digitized!"}, status=status.HTTP_400_BAD_REQUEST)
 
+    def create(self, request, *args, **kwargs):
+        invoice_serializer = InvoiceCreateSerializer(data=request.data)
+        invoice_serializer.is_valid(raise_exception=True)
+        invoice = invoice_serializer.save(created_by=request.user)
+        return JsonResponse(self.serializer_class(invoice).data)
+
+    def update(self, request, *args, **kwargs):
+        invoice = self.get_object()
+        invoice_serializer = InvoiceCreateSerializer(invoice, data=request.data)
+        invoice_serializer.is_valid(raise_exception=True)
+        invoice = invoice_serializer.save()
+        return JsonResponse(self.serializer_class(invoice).data)
+
     def get_permissions(self):
         permissions = super().get_permissions()
         permissions.append(InvoicePermission())
@@ -89,4 +102,3 @@ class CompanyViewSet(viewsets.ModelViewSet):
     """
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    permission_classes = [IsAuthenticated, ]
