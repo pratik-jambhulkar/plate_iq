@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from invoice.models import User, Invoice, Company
+from invoice.permissions import InvoicePermission
 from invoice.serializers import UserSerializer, InvoiceSerializer, CompanySerializer, UploadInvoiceSerializer, \
     InvoiceDigitizedSerializer
 
@@ -38,8 +39,8 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         upload_serializer.is_valid(raise_exception=True)
         return JsonResponse(self.serializer_class(self.queryset.first()).data)
 
-    @action(methods=['get'], detail=True, url_name='digitized', url_path='digitized')
-    def digitized(self, request, *_, **__):
+    @action(methods=['get'], detail=True, url_name='digitized_status', url_path='digitized-status')
+    def digitized_status(self, request, *_, **__):
         """
         Invoice digitization status API
         :param request:
@@ -59,6 +60,27 @@ class InvoiceViewSet(viewsets.ModelViewSet):
             return JsonResponse(self.serializer_class(invoice).data)
         else:
             return JsonResponse({'invoice': "The invoice is not digitized yet!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True, url_name='digitize', url_path='digitize')
+    def digitize(self, request, *_, **__):
+        """
+        Digitize invoice API
+        :param request:
+        :return: Invoice details if invoice is successfully digitized
+        """
+        invoice = self.get_object()
+        if not invoice.digitized:
+            invoice.digitized = True
+            invoice.digitized_by = request.user
+            invoice.save()
+            invoice.refresh_from_db()
+            return JsonResponse(InvoiceDigitizedSerializer(invoice).data)
+        return JsonResponse({'invoice': "The invoice is already digitized!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        permissions.append(InvoicePermission())
+        return permissions
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
