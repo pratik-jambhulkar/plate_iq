@@ -85,7 +85,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         invoice_serializer = InvoiceCreateSerializer(data=request.data)
         invoice_serializer.is_valid(raise_exception=True)
         invoice = invoice_serializer.save(created_by=request.user)
-        return JsonResponse(self.serializer_class(invoice).data)
+        return JsonResponse(self.serializer_class(invoice).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         """

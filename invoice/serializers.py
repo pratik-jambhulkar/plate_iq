@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
@@ -99,6 +102,7 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
     invoice_items = serializers.ListField(child=InvoiceItemSerializer(), min_length=1)
     digitized = serializers.BooleanField(default=False)
     invoice_number = serializers.CharField(default=generate_invoice_number)
+    deu_date = serializers.DateTimeField(input_formats=["%Y-%m-%d %H:%M:%S"], default_timezone=pytz.UTC)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -118,6 +122,11 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
+
+    def validate(self, attrs):
+        if 'deu_date' in attrs and attrs.get('deu_date') < datetime.now(tz=pytz.UTC):
+            raise serializers.ValidationError({'due_date': "Due date cannot be less than current date"})
+        return attrs
 
     class Meta:
         model = Invoice
